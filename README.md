@@ -70,4 +70,3 @@ Although simple, this project focuses on understanding data flow, validation log
 
 ## Workflow Screenshot
 ![Workflow Screenshot](screenshots/workflow.png)
-
