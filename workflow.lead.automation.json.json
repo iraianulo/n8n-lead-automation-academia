@@ -1,0 +1,278 @@
+{
+  "name": "Cliente 1 - Leads academia",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        -16
+      ],
+      "id": "7d1e3578-5c66-4e04-80ee-b7405505b62b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "nombre",
+              "value": "A Name",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "value": "example@email.com",
+              "type": "string"
+            },
+            {
+              "name": "telefono",
+              "value": "611222999",
+              "type": "string"
+            },
+            {
+              "name": "curso",
+              "value": "DAW",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        -16
+      ],
+      "id": "ab8fe34e-1c0c-49bb-a28e-02773495af83",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Leads academia"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet 1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $json.nombre }}",
+            "Email": "={{ $json.email }}",
+            "Teléfono": "={{ $json.telefono }}",
+            "Curso": "={{ $json.curso }}"
+          },
+          "matchingColumns": [
+            "Nombre"
+          ],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Teléfono",
+              "displayName": "Teléfono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Curso",
+              "displayName": "Curso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -304,
+        -16
+      ],
+      "id": "2b088186-ec6a-4f86-b364-0bbdf05a6752",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": { "name": "Google Sheets account" }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "example@email.com",
+        "subject": "Alumno interesado",
+        "message": "=<p><strong>Nuevo alumno interesado:</strong></p>\n\n<p>\nNombre: {{ $('Edit Fields').item.json.nombre }}<br>\nEmail: {{ $('Edit Fields').item.json.email }}<br>\nTeléfono: {{ $('Edit Fields').item.json.telefono }}<br>\nCurso: {{ $('Edit Fields').item.json.curso }}<br></p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        -144
+      ],
+      "id": "c42a1bda-7d9c-4336-bdfb-82264ab6e546",
+      "name": "Send a message",
+      "credentials": {
+        "gmailOAuth2": { "name": "Gmail account" }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6f128fe4-96a8-49f9-922f-20e6fffe7672",
+              "leftValue": "={{ $('Edit Fields').item.json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        -16
+      ],
+      "id": "bca389da-6c7f-446f-8b24-791bda92f7d7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.email }}",
+        "subject": "=Gracias por tu interés en  {{ $('Edit Fields').item.json.curso }}",
+        "message": "=<p>Hola {{ $('Edit Fields').item.json.nombre }},</p><p>Hemos recibido tu solicitud para el curso<strong>{{ $('Edit Fields').item.json.curso }}</strong>.</p><p>Te contactaremos pronto 😊</p><p>Un saludo,<br>Academia</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        -144
+      ],
+      "id": "cc73904c-2d78-46a4-b2c5-dd02041991fe",
+      "name": "Send a message1",
+      "credentials": {
+        "gmailOAuth2": { "name": "Gmail account" }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6196e472-5f06-4afe-b7d5-0597a96cf222",
+  "meta": { "templateCredsSetupCompleted": true },
+  "id": "TRn6GIs0DZSzYtXJ",
+  "tags": []
+}
